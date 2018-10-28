@@ -1,6 +1,10 @@
 # laser-turret
 An Arduino UNO controlled laser pointer.
 
+## Basic Function
+
+The joystick controls the servos for vertical and horizontal movement. Clicking in the joystick toggles the laser output.
+
 ## Software
 
 This project was programmed using the VSCode editor.
@@ -37,10 +41,6 @@ Setting files for the [Arduino extension](https://marketplace.visualstudio.com/i
 0: Joystick click \
 A0: X Joystick \
 A2: Y Joystick
-
-## Basic Function
-
-The joystick controls the servos for vertical and horizontal movement. Clicking in the joystick toggles the laser output.
 
 ## Future
 
