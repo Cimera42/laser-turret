@@ -1,5 +1,7 @@
-#include <Arduino.h>
-#include <Servo.h>
+#include <Adafruit_SoftServo.h>
+
+// #include <Arduino.h>
+// #include <Servo.h>
 
 struct GENERIC_DIGITAL
 {
@@ -14,15 +16,15 @@ struct GENERIC_DIGITAL
 		on = inOn;
 	}
 
-	void change()
-	{
-		digitalWrite(pin, on);
-	}
+	// void change()
+	// {
+	// 	digitalWrite(pin, on);
+	// }
 };
 
 struct SERVO
 {
-	Servo servo;
+	Adafruit_SoftServo servo;
 	int pos;
 	int oldPos;
 
@@ -47,16 +49,16 @@ struct JOYSTICK
 	uint8_t xPin, yPin, clickPin;
 	int lastX, x;
 	int lastY, y;
-	int16_t lastClick, click;
+	// int16_t lastClick, click;
 
-	void set(uint8_t inXPin, uint8_t inYPin, uint8_t inClickPin)
+	void set(uint8_t inXPin, uint8_t inYPin)//, uint8_t inClickPin)
 	{
 		xPin = inXPin;
 		yPin = inYPin;
-		clickPin = inClickPin;
+		// clickPin = inClickPin;
 
-		click = false;
-		lastClick = false;
+		// click = false;
+		// lastClick = false;
 
 		x = 0;
 		lastX = 0;
@@ -73,8 +75,8 @@ struct JOYSTICK
 		lastY = y;
 		y = analogRead(yPin) - 512;
 
-		lastClick = click;
-		click = !digitalRead(clickPin);
+		// lastClick = click;
+		// click = !digitalRead(clickPin);
 	}
 };
 
@@ -82,19 +84,31 @@ SERVO servo1;
 SERVO servo2;
 JOYSTICK joystick;
 GENERIC_DIGITAL laser;
+bool lastButton, button;
 
 void setup()
 {
-	Serial.begin(9600);
-	servo1.set(3);
-	servo2.set(5);
-	joystick.set(A0, A2, 0);
-	laser.set(7);
+	// Serial.begin(9600);
+	servo1.set(0);
+	servo2.set(1);
+	joystick.set(A2, A3);
+	// pinMode(0, OUTPUT);
+	// pinMode(1, OUTPUT);
+	// pinMode(2, OUTPUT);
+	// pinMode(3, OUTPUT);
+	// pinMode(4, OUTPUT);
+	OCR0A = 0xAF;            // any number is OK
+	TIMSK |= _BV(OCIE0A); // Turn on the compare interrupt (below!)
+
+	laser.set(2);
+	pinMode(laser.pin, INPUT);
+	button = HIGH;
+	lastButton = HIGH;
 }
 
 void loop()
 {
-	// Serial.println("cab");
+	// // Serial.println("cab");
 	joystick.read();
 
 	if(abs(joystick.x) > 50)
@@ -109,20 +123,39 @@ void loop()
 		servo2.pos = servo2.pos + normalY * 3;
 		servo2.pos = max(0, min(180, servo2.pos));
 	}
-	if(joystick.click && joystick.click != joystick.lastClick)
+
+	lastButton = button;
+	pinMode(laser.pin, INPUT);
+	button = digitalRead(laser.pin);
+	if(button == LOW && lastButton == HIGH)
 	{
 		laser.on = !laser.on;
-		laser.change();
 	}
-	// Serial.println("Start");
-	// Serial.println(laser.on);
-	// Serial.println(servo1.pos);
-	// Serial.println(servo2.pos);
-	// Serial.println(joystick.x);
-	// Serial.println(joystick.y);
+	if(laser.on)
+	{
+		pinMode(laser.pin, OUTPUT);
+	}
+	// // Serial.println("Start");
+	// // Serial.println(laser.on);
+	// // Serial.println(servo1.pos);
+	// // Serial.println(servo2.pos);
+	// // Serial.println(joystick.x);
+	// // Serial.println(joystick.y);
 
 	servo1.move();
 	servo2.move();
 
 	delay(20);
+}
+
+volatile uint8_t counter = 0;
+SIGNAL(TIMER0_COMPA_vect) {
+	// this gets called every 2 milliseconds
+	counter += 2;
+	// every 20 milliseconds, refresh the servos!
+	if (counter >= 20) {
+		counter = 0;
+		servo1.servo.refresh();
+		servo2.servo.refresh();
+	}
 }

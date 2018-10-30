@@ -3,14 +3,14 @@
         {
             "name": "Win32",
             "includePath": [
+                "C:\\Users\\Tim\\Documents\\Arduino\\libraries\\Adafruit_SoftServo",
+                "C:\\Users\\Tim\\AppData\\Local\\Arduino15\\packages\\attiny\\hardware\\avr\\1.0.2\\**",
                 "C:\\Program Files (x86)\\Arduino\\tools\\**",
                 "C:\\Program Files (x86)\\Arduino\\hardware\\arduino\\avr\\**",
                 "C:\\Program Files (x86)\\Arduino\\hardware\\tools\\avr\\avr\\include",
                 "C:\\Program Files (x86)\\Arduino\\libraries\\**"
             ],
-            "forcedInclude": [
-                "C:\\Program Files (x86)\\Arduino\\hardware\\arduino\\avr\\cores\\arduino\\Arduino.h"
-            ],
+            "forcedInclude": [],
             "intelliSenseMode": "msvc-x64",
             "compilerPath": "/usr/bin/gcc",
             "cStandard": "c11",
